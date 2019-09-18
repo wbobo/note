@@ -95,11 +95,94 @@ style继承，规范等。。。
 	* 如果某些图片在真机中异常，就出多套
 	* 奇葩机型，针对出图
 
-- 优化图片
+## 优化图片
+
+- 使用VectorDrawable
+> VD->WebP->Png->JPG
+    + 纯色icon，使用svg
+    + 两种颜色以上的icon,使用WebP
+    + WebP无法达到效果，使用png
+    + 没有alpha通道，可以使用jpg
+- svg使用技巧
+    + 设置恰当的宽度
+    > 如果复用设置成TextView中drawable的宽度
+    + 利用padding和scaleType属性
+    > 铺满，压缩，原样，比例压缩
+- webP使用技巧
+> png转webp : [智图](https://link.jianshu.com/?t=http://zhitu.isux.us/)或[isparta](https://link.jianshu.com/?t=http://isparta.github.io/)
+- 复用图片
+> 通过svg可以让一张图片适应不同大小的容器，比如关闭的"x"图标。
+- 使用Tint着色器
+> TintMode: add, multiply, screen, srcatop, srcin, src_over
+- 复用按压效果
+    + 列表由LinearLayout、RecyclerView组成
+    + 分割线用统一的shape进行绘制，不用切图
+    + 整个列表背景设置为白色
+    + item的背景是一个selector文件，正常颜色透明，按下颜色灰色
+- 通过旋转来复用
+- 压缩图片
+    1. 优先压缩大图，后小图
+    2. 不压缩点9图
+    3. 开屏大图压缩需要设计确认
+    4. 特别大图50k+考虑有损压缩
+    > 量化两张图片在视觉上的差别，可以尝试[butteraugli](https://link.jianshu.com/?t=https://github.com/google/butteraugli)
+
+    + [ImageOptim](https://link.jianshu.com/?t=https://imageoptim.com/mac)
+    + [pngquant](https://link.jianshu.com/?t=https://pngquant.org/)
+    + [tinypng](https://link.jianshu.com/?t=https://tinypng.com/)
+    > [gradle插件](https://link.jianshu.com/?t=https://github.com/mogujie/TinyPIC_Gradle_Plugin)
+    + 关闭aapt的图片压缩  
+
+```
+    android {  
+    defaultConfig {  
+        //...
+    }  
+
+    aaptOptions {  
+        cruncherEnabled = false 
+    }  
+} 
+```
+
+## 优化dex
+
+- 记录方法数和代码行数
+    + [dexcount](https://link.jianshu.com/?t=https://github.com/KeepSafe/dexcount-gradle-plugin)
+    + statistic插件
+    + [apk method](https://link.jianshu.com/?t=http://inloop.github.io/apk-method-count/)
+- 利用Lint分析无用代码
+> 借助as中的**Inspect Code**对工程做静态代码检查
+- 通过proguard来删除无用代码
+```
+android {
+    buildTypes {
+        release {
+            minifyEnabled true // 是否混淆
+        }
+    }
+}
+```
+>>配合proguard配置才能起作用
+- 剔除测试代码
+- 区分debug/rtm/release模式
+- 使用拆分后的support库
+- 减少方法数,不用mulitdex
+- 使用更小库或合并现有库
 
 
 
 
+
+  
+
+
+
+
+
+
+
+  
 
 
 #### 参考
