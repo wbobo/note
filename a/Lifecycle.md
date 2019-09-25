@@ -63,7 +63,12 @@ public abstract class Lifecycle{
 
 ```
 public class LifecycleRegistry extends Lifecycle{
-	
+
+	//自定义列表，用于保存观察者，并可以在遍历期间处理删除/添加操作。
+	private FastSafeIterableMap<LifecycleObserver, ObserverWithState> mObserverMap = new FastSafeIterableMap<>();
+
+	//当前状态
+	private State mState;
 }
 ```
 
@@ -71,8 +76,33 @@ public class LifecycleRegistry extends Lifecycle{
 
 
 
+## SafeIterableMap
++ 用链表来实现Map接口
+> get操作是通过头指针开始，一直往后找到对应key为止  
+put操作是直接在尾部插入
++ 遍历时删除元素
+> 每当需要遍历的时候，记下这个Iterator  
+删除元素时通知所有正在遍历的Iterator  
+Iterator收到通知后修正下一个元素  
+记下的Iterator是弱引用，防止遍历结束后内存泄漏
+> WeakHashMap可以帮助清理掉key，已经被回收的Entry(被GC的Iteratro)
+
+
+## addObserver方法
+1. 添加observer到SafeIterableMap中。
+2. 判断是否已经添加过
+3. 计算observer的State
+4. Observer计数器累加
+5. 重新计算observer的生命周期，并更新它。举个例子：ABCD周期，如果在C添加监听，则AB周期不会监听。生命周期持有者生命周期已经渡过，观察者也自动略过。
+6. 同步
+    1. 判断是否已经sync过。（通过判断SafeIterableMap中的首尾元素的state与Owner的state比较，Owner的state和Map中所有的Observer的state一致）
+    2. backwardPass， forwardPass ？？？
 
 
 
 
 
+
+##
+
+[SafeIterableMap：一个能在遍历中删除元素的数据结构](https://www.jianshu.com/p/4edb7dd555e4)
